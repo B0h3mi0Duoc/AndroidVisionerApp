@@ -1,5 +1,6 @@
-package com.example.appmov
+package com.example.appmov.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -20,21 +22,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.appmov.R
+import com.example.appmov.utils.RegistroUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistroScreen(
-    onRegistroClick: (String, String, String, String) -> Unit
+    onRegistroClick: () -> Unit = {}
 ) {
     var nombre by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
 
+
     // ComboBox País
     val paises = listOf("Chile", "Argentina", "Perú", "México")
     var paisExpanded by remember { mutableStateOf(false) }
     var paisSelected by remember { mutableStateOf(paises.first()) }
+
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -63,7 +70,7 @@ fun RegistroScreen(
             Spacer(modifier = Modifier.height(50.dp))
 
             // Nombre
-            OutlinedTextField(
+            TextField(
                 value = nombre,
                 onValueChange = { nombre = it },
                 label = { Text("Nombre de usuario") },
@@ -74,7 +81,7 @@ fun RegistroScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Correo
-            OutlinedTextField(
+            TextField(
                 value = correo,
                 onValueChange = { correo = it },
                 label = { Text("Correo electrónico") },
@@ -89,7 +96,7 @@ fun RegistroScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Contraseña con toggle
-            OutlinedTextField(
+            TextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
@@ -117,7 +124,7 @@ fun RegistroScreen(
                 expanded = paisExpanded,
                 onExpandedChange = { paisExpanded = !paisExpanded }
             ) {
-                OutlinedTextField(
+                TextField(
                     value = paisSelected,
                     onValueChange = {},
                     readOnly = true,
@@ -150,11 +157,32 @@ fun RegistroScreen(
 
             // Botón de registro
             Button(
-                onClick = { onRegistroClick(nombre, correo, password, paisSelected) },
+                onClick = {
+
+                    val registrado = RegistroUtils.guardarUsuario( nombre, password, correo, paisSelected)
+
+                    if (registrado.ok) {
+                        Toast.makeText(
+                            context,
+                            "Registrado correctamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        onRegistroClick()
+                    }
+                    else {
+                        Toast.makeText(
+                            context,
+                            registrado.errores.joinToString("\n"),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+              },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Registrarse")
+                Text("Registrarse",
+                    style = MaterialTheme.typography.bodyLarge)
             }
+
         }
     }
 }

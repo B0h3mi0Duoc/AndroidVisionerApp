@@ -1,4 +1,6 @@
-package com.example.appmov
+package com.example.appmov.utils
+
+import com.example.appmov.model.User
 
 object UserRepository {
     val usuarios = mutableListOf<User>()

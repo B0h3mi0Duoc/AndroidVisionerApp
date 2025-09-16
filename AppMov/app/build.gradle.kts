@@ -40,6 +40,11 @@ android {
 }
 
 dependencies {
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+// (opcional pero recomendado, para corrutinas con DataStore)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

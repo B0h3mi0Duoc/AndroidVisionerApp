@@ -1,5 +1,6 @@
-package com.example.appmov
+package com.example.appmov.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -12,8 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,12 +34,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextAlign
+import com.example.appmov.R
+import com.example.appmov.utils.RegistroUtils
 
 @Composable
 fun LoginScreen(
-    error: String,
-    onLoginHomeClick: (String, String) -> Unit
+    onHomeClick: () -> Unit
 ) { // *** SCREEN secundaria, FORMULARIO INGRESO DE USUARIO ***
     var correo by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -68,7 +72,7 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(50.dp))
             // Usuario -------------------------------
-            OutlinedTextField(
+            TextField(
                 value = correo,
                 onValueChange = { correo = it },
                 label = { Text("Ingrese correo") },
@@ -76,12 +80,13 @@ fun LoginScreen(
             )
 
             // Contraseña ------------------------------
-            OutlinedTextField(
+            TextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
+
                     .fillMaxWidth()
                     .padding(top = 12.dp)
             )
@@ -89,7 +94,13 @@ fun LoginScreen(
             // Botón INICIAR SESION -- Login ---------------------------------
             Button(
                 onClick = {
-                    onLoginHomeClick(correo, password)
+                    val res = RegistroUtils.autenticar(correo , password)
+                    if (res.ok) {
+                        Log.d("LoginScreen" , "validando usuario => " + res)
+                        onHomeClick()
+                    } else {
+                        Toast.makeText(context, "Login...", Toast.LENGTH_SHORT).show()
+                    }
                     println("enviando datos del ususario" + correo + password)
                     Toast.makeText(context, "Login...", Toast.LENGTH_SHORT).show()
                 },
@@ -97,16 +108,8 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ) {
-                Text("Iniciar Sesión")
-            }
-            if (error.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = error,
-                    color = Color.Red,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Text("Iniciar Sesión",
+                    style = MaterialTheme.typography.bodyLarge)
             }
 
             // OLVIDASTE TU CONTRASEÑA --  Recuperar clave--------------------------------------
